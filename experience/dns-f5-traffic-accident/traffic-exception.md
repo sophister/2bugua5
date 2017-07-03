@@ -87,6 +87,13 @@ TTFB居然要54秒，而且还是一个静态的图片，实在想不到这么�
 
 ![nginx connection status](./nginx-connection-status.png)
 
+再贴一下 `nginx stub status module` 里统计到的各个连接状态值的含义吧：
+
+![nginx stub status module 1](./nginx-stub-status-module-1.png)
+
+![nginx stub status module 2](./nginx-stub-status-module-2.png)
+
+
 但到底是什么导致的，现在仍没个说法……
 
 
