@@ -82,6 +82,11 @@ TTFB居然要54秒，而且还是一个静态的图片，实在想不到这么�
 并且在晚上9点左右，有一段时间网站请求恢复的时候，`writing`的值也恢复到正常水平，看现象来说，`writing`值
 偏高和网站响应慢，是有联系的。
 
+附上文末一篇链接里，对`nginx connetion status`的描述，感觉这个很重要，所以单独截图出来了，具体看
+文末相关链接的文章吧。
+
+![nginx connection status](./nginx-connection-status.png)
+
 但到底是什么导致的，现在仍没个说法……
 
 
