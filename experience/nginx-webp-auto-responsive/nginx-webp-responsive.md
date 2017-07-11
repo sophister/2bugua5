@@ -89,13 +89,18 @@ To avoid run-time errors, make sure that your LD_LIBRARY_PATH environment variab
 
 ### `lua`入门
 
+`lua`官方网站，貌似没有详细的学习文档！！
 
+
+* [lua官方文档](https://www.lua.org/start.html#installing)
+* [LUA简明教程](http://coolshell.cn/articles/10739.html)
+* [lua菜鸟入门教程](http://www.runoob.com/lua/lua-tutorial.html)
 
 ## 相关链接
 
-[腾讯云:基于 CDN 的 sharpP 自适应图片技术实践](https://www.qcloud.com/community/article/164816001481011868)
-[webp前端图片适配流量优化](https://github.com/ShowJoy-com/showjoy-blog/issues/10)
-[webp-automagically](https://www.maxcdn.com/blog/how-to-reduce-image-size-with-webp-automagically/)
-[webp 官方文档](https://developers.google.com/speed/webp/)
-[http Vary header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary)
-[Tengine + Lua + GraphicsMagick 实现图片自动裁剪/缩放](https://my.oschina.net/eduosi/blog/169606?utm_source=tuicool&utm_medium=referral)
+* [腾讯云:基于 CDN 的 sharpP 自适应图片技术实践](https://www.qcloud.com/community/article/164816001481011868)
+* [webp前端图片适配流量优化](https://github.com/ShowJoy-com/showjoy-blog/issues/10)
+* [webp-automagically](https://www.maxcdn.com/blog/how-to-reduce-image-size-with-webp-automagically/)
+* [webp 官方文档](https://developers.google.com/speed/webp/)
+* [http Vary header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary)
+* [Tengine + Lua + GraphicsMagick 实现图片自动裁剪/缩放](https://my.oschina.net/eduosi/blog/169606?utm_source=tuicool&utm_medium=referral)
