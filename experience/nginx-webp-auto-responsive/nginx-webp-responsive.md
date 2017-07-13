@@ -57,6 +57,83 @@
 
 嗯，第一步就卡住了，发现我们目前的 `nginx` 没有支持 `lua`脚本，还得找OP同学帮忙重新编译 `nginx`了。
 
+#### 安装 `lua 5.1.5`
+
+下载安装 `lua 5.1.5`, [http://www.lua.org/ftp/lua-5.1.5.tar.gz](http://www.lua.org/ftp/lua-5.1.5.tar.gz)
+
+`lua` 包依赖：
+
+* `yum install readline readline-devel`
+
+```shell
+tar xzf lua-5.1.5.tar.gz
+cd lua-5.1.5
+make linux
+make test
+make install
+```
+
+#### 安装 `LuaJIT 2.0.5`
+
+下载 `LuaJIT 2.0.5`, [http://luajit.org/download/LuaJIT-2.0.5.tar.gz](http://luajit.org/download/LuaJIT-2.0.5.tar.gz)
+
+```shell
+make
+make install
+```
+
+#### 下载 `ngx_devel_kit`
+
+下载 [ngx_devel_kit](https://github.com/simpl/ngx_devel_kit/archive/v0.3.0.tar.gz)
+
+```shell
+cd ngx_devel_kit-0.3.0
+```
+
+
+#### 下载 `lua-nginx-module`
+
+下载[lua-nginx-module 0.9.20](https://github.com/openresty/lua-nginx-module/archive/v0.9.20.tar.gz)
+
+```shell
+cd lua-nginx-module-0.9.20/
+```
+
+#### 编译 Tengine 1.5.2
+
+使用的是 `Tengine 1.5.2`， 对应 `nginx 1.2.9`
+
+坑爹啊，这个版本的 `tengine 1.5.2` 编译 `lua-nginx-module-0.9.20` 总是报错，后来重新下载
+[lua-nginx-module 0.7.19](https://github.com/openresty/lua-nginx-module/archive/v0.7.19.tar.gz)
+才编译通过！！
+
+```shell
+cd tengine-1.5.2
+export LUAJIT_LIB=/opt/app/LuaJIT-2.0.5/lib
+export LUAJIT_INC=/opt/app/LuaJIT-2.0.5/include/luajit-2.0
+
+./configure --prefix=/home/tomcat/program/tengine --with-ld-opt="-Wl,-rpath,/opt/app/LuaJIT-2.0.5/lib" --pid-path=/home/tomcat/program/tengine/var/run/nginx.pid --lock-path=/home/tomcat/program/tengine/var/run/nginx.lock --with-openssl=../openssl-1.0.1t --user=tomcat --group=tomcat --with-http_ssl_module --with-http_gzip_static_module  --with-http_upstream_check_module --with-http_stub_status_module --add-module=/home/tomcat/source/ngx_devel_kit-0.3.0 --add-module=/home/tomcat/source/lua-nginx-module-0.7.19
+```
+
+上述nginx安装完只，在 `nginx.conf` 中加入测试代码：
+
+```
+location /hello {
+      default_type 'text/plain';
+      content_by_lua 'ngx.say("hello, lua")';
+}
+```
+
+重新`nginx`, 浏览器访问 `/hello`，终于OK了 :)
+
+
+安装过程参考资料：
+
+* [http://tengine.taobao.org/documentation.html](http://tengine.taobao.org/documentation.html)
+* [安装配置Nginx和LuaJIT](https://laijinman.com/installing-nginx-and-lua)
+* [lua-nginx-module](https://github.com/openresty/lua-nginx-module/tree/v0.9.20#installation)
+
+
 ### `CentOS`上安装 `libwebp`
 
 `CentOS`上安装依赖包：
