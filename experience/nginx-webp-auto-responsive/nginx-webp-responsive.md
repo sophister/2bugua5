@@ -48,8 +48,15 @@
 * 完美点，不同 `query`的图片对应不同的 `webp`版本，这就需要在生成 `webp`时，把 `query` 也作为
 文件名的一部分来存储。
 
-昨天本来想简单搞的，现在看来，还是先尝试完美一点的方案吧~
+昨天本来想简单搞的，现在看来，<s>还是先尝试完美一点的方案吧~</s>; 针对不同`query`的图片都生成一份
+`webp`版本，容易被攻击，还是放弃这个方案了，如果图片请求包含了`query`参数，**直接返回原图**
 
+demo开发中，遇到个问题，在`location`中使用了`add_header Vary 'Accept' ;` 来增加响应的`header`,
+但是发现实际没生效，应该和`lua`代码中的`ngx.exec(somePath)`有关系。
+
+不仅上面这个问题，即使在`lua`代码中，使用 `ngx.header.Vary = 'Accept'` 添加的header，也有个诡异
+的问题，加上这个header后，`Content-Type` 变了，不是返回的 `image/webp`， 而是原图对应的 `MIME`。
+这就尴尬了……
 
 ## 撸码过程
 
@@ -173,6 +180,15 @@ To avoid run-time errors, make sure that your LD_LIBRARY_PATH environment variab
 * [LUA简明教程](http://coolshell.cn/articles/10739.html)
 * [lua菜鸟入门教程](http://www.runoob.com/lua/lua-tutorial.html)
 
+
+### `lua with nginx`
+
+
+* [openresty-best-practices](https://moonbingbing.gitbooks.io/openresty-best-practices/ngx_lua/phase.html)
+* [跟我学OpenResty](http://jinnianshilongnian.iteye.com/blog/2190344)
+
+
+
 ## 相关链接
 
 * [腾讯云:基于 CDN 的 sharpP 自适应图片技术实践](https://www.qcloud.com/community/article/164816001481011868)
@@ -181,3 +197,4 @@ To avoid run-time errors, make sure that your LD_LIBRARY_PATH environment variab
 * [webp 官方文档](https://developers.google.com/speed/webp/)
 * [http Vary header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary)
 * [Tengine + Lua + GraphicsMagick 实现图片自动裁剪/缩放](https://my.oschina.net/eduosi/blog/169606?utm_source=tuicool&utm_medium=referral)
+* [Deploying WebP via Accept Content Negotiation](https://www.igvita.com/2013/05/01/deploying-webp-via-accept-content-negotiation/)
