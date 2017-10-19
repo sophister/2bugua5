@@ -1,7 +1,7 @@
 # webp图片实战
 
 
-##　上webp难于上晴天
+## 上webp难于上青天
 
 之前关于`webp图片`上线，调研了一个通过 `服务端内容协商(server content negotiation)` 的技术
 实现方案，具体见 [nginx webp 响应式](https://github.com/sophister/2bugua5/blob/master/experience/nginx-webp-auto-responsive/nginx-webp-responsive.md) 。但是这个方案，上线起来成本比较大，需要推动OP，升级`nginx`，安装`lua`脚本的相关依赖，
