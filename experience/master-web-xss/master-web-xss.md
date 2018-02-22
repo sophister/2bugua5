@@ -79,5 +79,5 @@ MDN上对`CSP`要解决的问题，是这样描述的：
 * 这篇文章讲的不错，但是有些细节不清楚  [http://imweb.io/topic/57024e4606f2400432c1396d](http://imweb.io/topic/57024e4606f2400432c1396d)
 * 这篇大概讲浏览器如何解码，可以看一下  [http://xuelinf.github.io/2016/05/18/%E7%BC%96%E7%A0%81%E4%B8%8E%E8%A7%A3%E7%A0%81-%E6%B5%8F%E8%A7%88%E5%99%A8%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/](http://xuelinf.github.io/2016/05/18/%E7%BC%96%E7%A0%81%E4%B8%8E%E8%A7%A3%E7%A0%81-%E6%B5%8F%E8%A7%88%E5%99%A8%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/)
 * 宜人贷的这篇博客讲的更深入一些 [https://security.yirendai.com/news/share/26](https://security.yirendai.com/news/share/26)
-* 这篇文章强烈推荐仔细阅读，应该囊括了前面两篇的知识  [https://www.attacker-domain.com/2013/04/deep-dive-into-browser-parsing-and-xss.html](https://www.attacker-domain.com/2013/04/deep-dive-into-browser-parsing-and-xss.html)
+* **这篇文章强烈推荐仔细阅读，应该囊括了前面两篇的知识**   [https://www.attacker-domain.com/2013/04/deep-dive-into-browser-parsing-and-xss.html](https://www.attacker-domain.com/2013/04/deep-dive-into-browser-parsing-and-xss.html)
 * 浏览器URL解析的W3C规范，只看懂了一小部分，[https://url.spec.whatwg.org/#url-parsing](https://url.spec.whatwg.org/#url-parsing)
