@@ -167,6 +167,7 @@ CC攻击防护，也应该常态化，常态化，常态化！
 ## 相关资料
 
 * [低成本实现百 Gbps DDoS/CC 攻击防护](https://juejin.im/entry/59f6cbf051882561a32637bf)
+* [聊聊高并发系统之限流特技](http://jinnianshilongnian.iteye.com/blog/2305117)
 * [如何提升防御CC攻击的能力](https://segmentfault.com/a/1190000009264979)
 * [CC攻击原理及防范方法](https://www.cnblogs.com/wpjamer/p/9030259.html)
 
