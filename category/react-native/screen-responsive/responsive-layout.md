@@ -6,7 +6,7 @@
 
 在移动端的web页面适配上，我们采用的是手机淘宝出的 [lib-flexible](https://github.com/amfe/lib-flexible) 方案，大部分情况下，`rem` 一把梭，基本上解决了屏幕适配问题。
 
-在 `React Native`的页面布局里，也很自然想到使用类似的方案，根据当前屏幕宽度，计算出应该显示的尺寸，梭哈即可。然鹅，在和UE同学确认时，才知道移动端的方案，他们并不太满意，换句话，UE在很多情况下，并不希望界面按照屏幕尺寸来等比缩放。
+在 `React Native`的页面布局里，也很自然想到使用类似的方案，根据当前屏幕宽度，计算出应该显示的尺寸，梭哈即可。然鹅，在和UE同学确认时，才知道移动端H5的方案，他们并不太满意，换句话，UE在很多情况下，并不希望界面按照屏幕尺寸来等比缩放。
 
 
 ## RN 里怎么适配
@@ -61,6 +61,14 @@ const style = {
 //render
 <View style={style}></View>
 ```
+
+### StyleSheet.create VS global JSON VS inline JSON
+
+在写 `style` 的时候，根据 [RN官方文档](https://facebook.github.io/react-native/docs/stylesheet)，应该使用 `StyleSheet.create` 来生成样式，这样写能 <s>提升性能</s>。然鹅，根据源码和issue的情况来看，目前来说，`react-native@0.57`版本，`StyleSheet.create`内部并没有任何提升性能的操作，只是单纯的返回了传入的 JSON，当然，在 `DEV`模式下，会校验下style的属性。可以参考 [这个commit](https://github.com/facebook/react-native/commit/a8e3c7f5780516eb0297830632862484ad032c10) 和 [这个issue](https://github.com/DefinitelyTyped/DefinitelyTyped/issues/29265) 。
+
+虽然 `StyleSheet.create` 和 `global JSON style` 样式相比，没有什么性能提升；但是和 `inline JSON` 的样式相比，还是有一些优势的。`inline JSON style` 如果数据比较多，会让代码可读性降低，并且每次 `render` 都会构造新的对象，这也是一种损耗。
+
+不过，尽管目前 `StyleSheet.create` 没神马X用，我们还是统一调用 `StyleSheet.create` 来生成样式吧，万一在将来哪个版本，传说中的性能提升又悄悄加上了呢……
 
 
 ## 相关资料
