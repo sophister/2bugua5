@@ -2,6 +2,13 @@
 
 为了统一编码习惯，增强 `React Native`代码可维护性，收集一些常见的UI样式，统一提供实现方案。
 
+## 编码约定
+
+* `style`应该尽量写在外面；使用 `inline style` 时最多包含2个样式
+* `DOM` 树里 **不使用** 三元运算符生成 `DOM`
+* `page` 尽量拆分组件，避免 `render` 太大，减少冗余的 `DOM` 层级
+* 优先使用 `Functional Component` 和 `PureComponent`
+
 ## Text 常见样式
 
 相关链接:
@@ -18,7 +25,7 @@
 ```javascript
 const style = {
     lineHeight: 40,
-    fontSize: xxx,
+    fontSize: 16,
 };
 <Text style={style}>some single line text to vertical align</Text>
 ```
@@ -33,7 +40,7 @@ const styles = {
         justifyContent: 'center',
     },
     text: {
-        fontSize: xxx,
+        fontSize: 16,
         includeFontPadding: false,
         textAlignVertical: 'center',
     }
