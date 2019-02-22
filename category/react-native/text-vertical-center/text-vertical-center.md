@@ -14,6 +14,10 @@
 
 在搜索 `Text` 垂直居中的过程中，发现有些文章里，在 `Text` 上使用了 `justifyContent: center` 这样的属性。这个属性应该是用在 **flex容器** 上面的，所以在demo里，测试了下 `Text` 能否通过 `display: flex` 升级为 flex容器。实验证明，`Text` 不能作为 flex容器，因此，使用 `justifyContent` 应该也是没有作用的。
 
+## Text fontFamily是否支持多个值
+
+`Text`的字体 `fontFamily`，也和 `web` 上有较大区别。`web`上可以在`css`中给`fontFamily`设置多个值，包括各种备选方案；但是在 `RN`里，`fontFamily` **只支持一个值** ，不能设置多个！
+
 ## Text支持的style
 
 通过官方文档[text#style](https://facebook.github.io/react-native/docs/text#style)，有几个样式会涉及到文本的垂直居中：`lineHeight` `includeFontPadding` `textAlignVertical`。其中，`includeFontPadding` 和 `textAlignVertical` 只支持 `android` 系统。
@@ -69,4 +73,4 @@ const styles = {
 
 ## 相关链接
 
-* 
+* [RN Text fontFamily只支持一个值](https://github.com/facebook/react-native-website/issues/800)
