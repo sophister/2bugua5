@@ -1,0 +1,66 @@
+# PWA H5页面性能优化
+
+
+
+## service worker 支持情况
+
+根据 [https://caniuse.com/#feat=serviceworkers](https://caniuse.com/#feat=serviceworkers) 的数据，`android 5` 之后，`WebView` 就支持 `serviceworker`；`iOS 11.3` 之后，也支持了。
+
+找到这个MDN的链接 [https://mdn.github.io/sw-test/](https://mdn.github.io/sw-test/) ，来测试 `serviceworker` 的缓存情况。
+
+经过实际的测试，`iOS 11.3`上，`Safari`是支持 `serviceworker`的，在 `iphone simulator`里，通过添加 `com.apple.developer.WebKit.ServiceWorkers  YES` ，`WKWebView`也可以支持 `serviceworker`，但是！但是，`iOS`的 **APP里 WKWebView** 是不支持 `serviceworker` 的！！库克这个糟老头子，实在是坑啊……
+
+## 跨域请求
+
+### Request.mode
+
+根据 [https://developer.mozilla.org/en-US/docs/Web/API/Request/mode](https://developer.mozilla.org/en-US/docs/Web/API/Request/mode) 文档的介绍，跨域请求中，需要特别关注 `Request.mode` 这个 **readonly** 属性，这个属性会决定，在 `Response` 中，我们可以读取到哪些属性。`Request.mode` 包括以下几个值： `same-origin` `no-cors` `cors` `navigate` 。在不同的情况下，`Request.mode`的默认值是不一样的，重点要关注 `no-cors` 和 `cors`
+
+* `no-cors`: 只允许发起 `HEAD` `GET` `POST` 请求，JS **不能** 读取到 `Response` 中的任何属性。`html`页面内嵌的资源请求，不设置 `crossorigin` 的情况下，默认都是 `no-cors` 模式，包括这些标签：`<link>` `<script>` `<img>` `<audio>` `<video>` `<object>` `<embed>` `<iframe>`。
+* `cors`: 遵循 `CORS` 协议，并且允许在 JS 里读取 `Response` 的部分属性
+
+### Response.type
+
+对应上述的 `Request.mode`，还存在一个只读的 `Response.type` 属性，用来判断当前的响应，是一个什么类型的请求，包括这些值：
+
+* `basic`: 正常的、满足 `同源策略` 的请求，允许JS读取 除了 `Set-Cookie` 和 `Set-Cookie2` 以外的，所有响应header
+* `cors`: 合法的跨域请求，能读取部分响应header，包括http状态码
+* `error`:
+* `opaque`: 对应 `Request.mode` 是 `no-cors` 的请求，**不能** 读取任何属性，包括 http状态码
+* `opaqueredirect`:  
+
+### CORS crossorigin
+
+通常情况下，我们页面里的静态资源，包括 `<img>` `<link>` `<script>` 都会通过单独的域名来加载，这个域名一般和主页面的域名 **不同**，在 `html5` 里允许我们设置元素的 `crossorigin` 属性，来主动控制是否发送用户的credentials，包括 `Cookie` 。`crossorigin` 在默认情况下(即元素上不设置该属性)，不会发起 `CORS` 请求；该属性只有2个可能的值：
+
+* `anonymous`: 发起 `CORS` 请求，并且将 credentials 设置为 `same-origin`
+* `use-credentials`: 发起 `CORS` 请求，并且将  credentials 设置为 `include`
+
+### service worker 拦截跨域请求
+
+`serviceworker`可以拦截作用域下发起的所有请求，包括 **跨越请求** 。通常在缓存静态资源的时候，我们需要确保资源是正确响应的(比如返回http状态码200)，如果返回的是 `404` 或者 `500` 之类的，那么就不应该缓存该资源。但是在 **跨域** 的请求下，默认的 `Request.mode no-cors` 我们 **不能** 读取返回的状态码，也就不知道资源是否OK；因此需要设置跨域资源的 `cors` 属性，比如页面里静态资源，设置 `crossorigin=anonymous` ，这样会触发浏览器发起 `CORS` 请求，也就要求我们的服务器返回header中，增加 `Access-Control-Allow-Origin` 来允许我们跨域访问该资源。
+
+## 上线方案
+
+针对我厂的情况，在移动端H5页面，我们主域名是 `m.renrendai.com`，引用的JS、css、图片等静态资源，使用的是 `s0.renrendai.com`，存在静态资源跨域的情况，因此，需要以下准备工作：
+
+* 修改线上域名 `s0.renrendai.com` 下的 `nginx` 配置，配置 `Access-Control-Allow-Origin` 允许 `m.renrendai.com` 跨域请求
+* 修改模板、JS组件，加载 `<script>` `<link>` `<img>` 时，附带上 `corssorigin=anonymous` 属性
+* 在 `serviceworker` 代码里，只缓存 `s0.renrendai.com` 和 `m.renrendai.com` 下的静态资源(包括JS、CSS、图片)。需要确认，在缓存 `s0.renrendai.com` 的资源时，只缓存http状态码是 `200` 的
+* 灰度&回滚：增加可动态修改的开关，用来开启&关闭 `serviceworker` 。
+
+**PS**： 考虑到后期可能会上线 PC 端的对应缓存方案，针对 `s0.renrendai.com` 的 `nginx` 配置修改，可能要动态的根据请求 `Origin` 来返回不同的 `Access-Control-Allow-Origin` 值。
+
+## 相关资料
+
+* [让老板虎躯一震的前端技术，KPI杀手](https://zhuanlan.zhihu.com/p/55072221?utm_source=wechat_session&utm_medium=social&utm_oi=827877323658395648)
+* [腾讯X5浏览器内核-Service Worker最佳实践](https://x5.tencent.com/tbs/guide/serviceworker.html)
+* [PWA 在饿了么的实践经验](https://zhuanlan.zhihu.com/p/25800461)
+* [lavas-service worker](https://lavas.baidu.com/pwa/offline-and-cache-loading/service-worker/service-worker-introduction)
+* [谨慎处理 Service Worker 的更新](https://zhuanlan.zhihu.com/p/51118741)
+* [service-workers-unavailable-in-wkwebview-in-ios-11-3](https://stackoverflow.com/questions/49673399/service-workers-unavailable-in-wkwebview-in-ios-11-3)
+* [what-limitations-apply-to-opaque-responses](https://stackoverflow.com/questions/39109789/what-limitations-apply-to-opaque-responses)
+* [Workbox Google开源的service worker工具库](https://developers.google.com/web/tools/workbox/)
+* [Workbox: Handle Third Party Requests](https://developers.google.com/web/tools/workbox/guides/handle-third-party-requests)
+* [PWA系列 -- 分享PWA在阿里体系内的实践经验](https://zhuanlan.zhihu.com/p/50502316)
+* [How do I uninstall a Service Worker?](https://stackoverflow.com/questions/33704791/how-do-i-uninstall-a-service-worker)
