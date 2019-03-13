@@ -4,6 +4,7 @@
 
 不过，`PWA`主要是给 `SPA` 来使用的，我们目前的业务确实还用不上。那就用一下其中的 `Service Worker`这个东东吧，试试对我们的 `H5` 秒开有没有什么功效。根据之前测试的情况，目前我们APP里的 `WebView`，处理缓存是存在问题的，理论上我们的静态资源都是强缓存的，但实际上发现，很多时候，页面仍然会重新请求静态资源，导致H5加载速度比较慢。如果能使用 `Service Worker`技术，**主动** 地缓存静态资源，而不是被动地交给浏览器处理，是不是能够解决静态资源的缓存问题呢？
 
+
 ## service worker
 
 `Service Worker` (下文简称SW)，能够拦截作用域(scope)下的页面，以及该页面发出的请求，包括 **跨越请求** 。
@@ -34,7 +35,7 @@ SW 的JS是在单独的进程这执行的，有自己的全局作用域，也有
 
 ### SW和主页面通信
 
-在主页面里，向SW触发事件，可以像下面这样:
+1. 在主页面里，向SW触发事件，可以像下面这样:
 
 ```javascript
 // in app.js
@@ -51,6 +52,31 @@ self.addEventListener('message', function (event) {
     console.log(event.data);
 });
 ```
+
+2. 在 SW 里向主页面触发事件：
+
+```javascript
+// in sw.js
+self.clients.matchAll().then(function (clients) {
+    console.log('clients in sw: ', clients);
+    clients.forEach(function (client) {
+        client.postMessage({
+            hello: "word",
+            yes: true,
+            nest: {
+                obj: {age: 31},
+                num: -23,
+                bool: false,
+            },
+        });
+    });
+});
+// in app.js
+navigator.serviceWorker.addEventListener('message', function(event){
+    console.log('message from sw: ', event.data);
+});
+```
+
 
 ## 跨域请求
 
@@ -93,6 +119,7 @@ self.addEventListener('message', function (event) {
 * 灰度&回滚：增加可动态修改的开关，用来开启&关闭 `serviceworker` 。
 
 **PS**： 考虑到后期可能会上线 PC 端的对应缓存方案，针对 `s0.renrendai.com` 的 `nginx` 配置修改，可能要动态的根据请求 `Origin` 来返回不同的 `Access-Control-Allow-Origin` 值。
+
 
 ## 相关资料
 
