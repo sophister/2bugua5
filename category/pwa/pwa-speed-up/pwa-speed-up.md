@@ -114,8 +114,10 @@ navigator.serviceWorker.addEventListener('message', function(event){
 
 * 修改线上域名 `s0.renrendai.com` 下的 `nginx` 配置，配置 `Access-Control-Allow-Origin` 允许 `m.renrendai.com` 跨域请求
 * 修改模板、JS组件，加载 `<script>` `<link>` `<img>` 时，附带上 `corssorigin=anonymous` 属性
+* 使用 `Workbox` 库
 * **不** 缓存页面
 * 在 `serviceworker` 代码里，只缓存 `s0.renrendai.com` 和 `m.renrendai.com` 下的静态资源(包括JS、CSS、图片)。需要确认，在缓存 `s0.renrendai.com` 的资源时，只缓存http状态码是 `200` 的
+* 静态资源(JS、CSS、图片)，因为文件名都带了 `md5`，因此全部使用 **cache first** 策略
 * 灰度&回滚：增加可动态修改的开关，用来开启&关闭 `serviceworker` 。
 
 **PS**： 考虑到后期可能会上线 PC 端的对应缓存方案，针对 `s0.renrendai.com` 的 `nginx` 配置修改，可能要动态的根据请求 `Origin` 来返回不同的 `Access-Control-Allow-Origin` 值。
@@ -134,3 +136,4 @@ navigator.serviceWorker.addEventListener('message', function(event){
 * [Workbox: Handle Third Party Requests](https://developers.google.com/web/tools/workbox/guides/handle-third-party-requests)
 * [PWA系列 -- 分享PWA在阿里体系内的实践经验](https://zhuanlan.zhihu.com/p/50502316)
 * [How do I uninstall a Service Worker?](https://stackoverflow.com/questions/33704791/how-do-i-uninstall-a-service-worker)
+* [淘宝FED: Workbox 3：Service Worker 可以如此简单](http://taobaofed.org/blog/2018/08/08/workbox3/)
