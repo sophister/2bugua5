@@ -1,14 +1,36 @@
 # PWA H5页面性能优化
 
+`PWA` 这个名词出来有一段时间了，一直没能实践下，业务上暂时也还没什么动机能上的。但是越来越多的大厂，包括 饿了么、Twitter、阿里等，都开始在生产环境大量使用相关技术，是时候重新来看看这个东东了。
 
+不过，`PWA`主要是给 `SPA` 来使用的，我们目前的业务确实还用不上。那就用一下其中的 `Service Worker`这个东东吧，试试对我们的 `H5` 秒开有没有什么功效。根据之前测试的情况，目前我们APP里的 `WebView`，处理缓存是存在问题的，理论上我们的静态资源都是强缓存的，但实际上发现，很多时候，页面仍然会重新请求静态资源，导致H5加载速度比较慢。如果能使用 `Service Worker`技术，**主动** 地缓存静态资源，而不是被动地交给浏览器处理，是不是能够解决静态资源的缓存问题呢？
 
-## service worker 支持情况
+## service worker
+
+`Service Worker` (下文简称SW)，能够拦截作用域(scope)下的页面，以及该页面发出的请求，包括 **跨越请求** 。
+
+### 浏览器支持情况
 
 根据 [https://caniuse.com/#feat=serviceworkers](https://caniuse.com/#feat=serviceworkers) 的数据，`android 5` 之后，`WebView` 就支持 `serviceworker`；`iOS 11.3` 之后，也支持了。
 
 找到这个MDN的链接 [https://mdn.github.io/sw-test/](https://mdn.github.io/sw-test/) ，来测试 `serviceworker` 的缓存情况。
 
 经过实际的测试，`iOS 11.3`上，`Safari`是支持 `serviceworker`的，在 `iphone simulator`里，通过添加 `com.apple.developer.WebKit.ServiceWorkers  YES` ，`WKWebView`也可以支持 `serviceworker`，但是！但是，`iOS`的 **APP里 WKWebView** 是不支持 `serviceworker` 的！！库克这个糟老头子，实在是坑啊……
+
+### ServiceWorkerGlobalScope
+
+SW 的JS是在单独的进程这执行的，有自己的全局作用域，也有自己的全局变量(状态)。但是，根据 [https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope) 的说明，SW 的去全局状态，当SW被中断或者重启时，会被重置为默认状态，**不会** 持久化。因此，我们 **不应该** 在SW中设置自定义的全局变量，因为这些变量的状态，并没有持久化。
+
+### 生命周期
+
+
+
+### 作用时机
+
+* 首次注册&激活：在这种情况下，SW **不会** 拦截到页面内的请求，即使在SW激活之后，页面后续产生的请求，都 **不能** 拦截到
+* 注销：在调用 `unregister` 之后，当前激活的SW **仍然** 会控制当前页面的请求，直到页面关闭
+
+### SW和主页面通信
+
 
 ## 跨域请求
 
