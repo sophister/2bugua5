@@ -20,17 +20,37 @@
 
 SW 的JS是在单独的进程这执行的，有自己的全局作用域，也有自己的全局变量(状态)。但是，根据 [https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope) 的说明，SW 的去全局状态，当SW被中断或者重启时，会被重置为默认状态，**不会** 持久化。因此，我们 **不应该** 在SW中设置自定义的全局变量，因为这些变量的状态，并没有持久化。
 
-### 生命周期
+### 事件
 
-
+* install: 初次安装SW时，在SW内触发的事件，可以在这个事件里，添加一些静态资源的缓存
+* activate: SW安装成功之后，会触发这个事件，可以在这里，删除旧版本的缓存
+* fetch: 在控制的页面内，发起请求时，触发SW这个事件，可以替换返回的响应
+* 更新: 当发现新的SW时，将会加载并执行该SW，触发 `install` 事件，但 **不会** 触发 `activate` 事件。如果当前有激活的SW，新的SW将会等待旧的退出(刷新页面没用，必须要关闭旧的SW控制的所有标签页)，再触发新的 `activate` 事件并接管页面控制。也可以在 `install` 事件中，调用 `self.skipWaiting()` 来跳过等待状态，尽快激活自己
 
 ### 作用时机
 
-* 首次注册&激活：在这种情况下，SW **不会** 拦截到页面内的请求，即使在SW激活之后，页面后续产生的请求，都 **不能** 拦截到
+* 首次注册&激活：在这种情况下，SW **不会** 拦截到页面内的请求，即使在SW激活之后，页面后续产生的请求，都 **不能** 拦截到。除非 SW 主动调用 `self.clients.claim()` ，调用之后，即使是首次注册激活，也能拦截页面后续的请求。见 [https://developer.mozilla.org/en-US/docs/Web/API/Clients/claim](https://developer.mozilla.org/en-US/docs/Web/API/Clients/claim)
 * 注销：在调用 `unregister` 之后，当前激活的SW **仍然** 会控制当前页面的请求，直到页面关闭
 
 ### SW和主页面通信
 
+在主页面里，向SW触发事件，可以像下面这样:
+
+```javascript
+// in app.js
+navigator.serviceWorker.controller.postMessage({
+    name: 'hello',
+    age: 30,
+    deep: {
+        arr: [ 1, 2, 3],
+        test: true,
+    }
+});
+// in sw.js
+self.addEventListener('message', function (event) {
+    console.log(event.data);
+});
+```
 
 ## 跨域请求
 
@@ -68,6 +88,7 @@ SW 的JS是在单独的进程这执行的，有自己的全局作用域，也有
 
 * 修改线上域名 `s0.renrendai.com` 下的 `nginx` 配置，配置 `Access-Control-Allow-Origin` 允许 `m.renrendai.com` 跨域请求
 * 修改模板、JS组件，加载 `<script>` `<link>` `<img>` 时，附带上 `corssorigin=anonymous` 属性
+* **不** 缓存页面
 * 在 `serviceworker` 代码里，只缓存 `s0.renrendai.com` 和 `m.renrendai.com` 下的静态资源(包括JS、CSS、图片)。需要确认，在缓存 `s0.renrendai.com` 的资源时，只缓存http状态码是 `200` 的
 * 灰度&回滚：增加可动态修改的开关，用来开启&关闭 `serviceworker` 。
 
