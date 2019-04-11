@@ -2,7 +2,15 @@
 
 
 
-`React`里的组件，有从父级组件传下来的props，也可以有自己的状态state。在state改变时，会触发组件重新render。
+ ![](./banner.png)
+
+
+
+**注**：头图来自于 [https://ihatetomatoes.net/react-state-management-tutorial-do-you-really-need-redux-or-mobx/](https://ihatetomatoes.net/react-state-management-tutorial-do-you-really-need-redux-or-mobx/)  
+
+
+
+React`里的组件，有从父级组件传下来的props，也可以有自己的状态state。在state改变时，会触发组件重新render。
 
 但是在实际开发中，经常会在state上很纠结，比如下面这些问题：
 
