@@ -10,7 +10,7 @@
 
 
 
-React`里的组件，有从父级组件传下来的props，也可以有自己的状态state。在state改变时，会触发组件重新render。
+`React`里的组件，有从父级组件传下来的props，也可以有自己的状态state。在state改变时，会触发组件重新render。
 
 但是在实际开发中，经常会在state上很纠结，比如下面这些问题：
 
@@ -88,7 +88,7 @@ Again，没有银弹！如果我们页面的state结构很简单，没有复杂�
 
 
 
-**最后，再次推荐没事多读读官方的 [thinking in react](https://reactjs.org/docs/thinking-in-react.html) ，没事多读读，神清气爽，有问题多读读，提神醒脑。** 
+**最后，再次推荐没事多读读官方的 [thinking in react](https://reactjs.org/docs/thinking-in-react.html) ，没事多读读，神清气爽；有问题多读读，提神醒脑。** 
 
 
 
