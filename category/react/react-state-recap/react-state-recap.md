@@ -102,6 +102,7 @@ Again，没有银弹！如果我们页面的state结构很简单，没有复杂�
 * [Question: How to choose between Redux's store and React's state?](https://github.com/reduxjs/redux/issues/1287) 
 * [In depth: When and why are setState() calls batched?](https://stackoverflow.com/a/48610973/458193)
 * [In depth: Why isn’t this.state updated immediately?](https://github.com/facebook/react/issues/11527#issuecomment-360199710)  
+* [React setState 异步与同步？](https://juejin.im/post/5b45c57c51882519790c7441) 
 
 
 
