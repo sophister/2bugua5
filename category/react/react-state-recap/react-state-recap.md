@@ -45,6 +45,10 @@ PS：每次有疑问的时候，我强烈建议先把官方的 [thinking in reac
 
 
 
+使用 `计算属性`，在一些性能要求高的场景，可以搭配 `memoization` 使用，效果更佳。<https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#what-about-memoization> 
+
+
+
 ## state放在哪儿？
 
 
