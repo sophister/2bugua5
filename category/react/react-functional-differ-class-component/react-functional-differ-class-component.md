@@ -242,7 +242,7 @@ function ProfilePage(props) {
 
 这个函数组件和上面的类组件一样，内部函数捕获了props，react会把props作为函数参数传进去。**和this不同的是，props是不可变的，react不会修改props** 。
 
-如果你在函数参数里，把props结构，代码看起来会更加清晰:
+如果你在函数参数里，把props解构，代码看起来会更加清晰:
 
 ```javascript
 function ProfilePage({ user }) {
