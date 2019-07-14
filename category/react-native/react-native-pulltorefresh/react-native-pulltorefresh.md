@@ -108,7 +108,12 @@ setProgress({pullDistance, percent}){}
 
 
 * [React Native PanResponder官方文档](https://facebook.github.io/react-native/docs/panresponder) 
-
 * [PanResponder demo in Navigator](https://snack.expo.io/@spencercarli/basic-javascript-navigator-example) 
 * [使用 Animated.event 自动映射ScrollView的滚动位置](https://facebook.github.io/react-native/docs/animated.html#handling-gestures-and-other-events) 
 * [lottie-react-native](https://github.com/react-native-community/lottie-react-native) 
+
+
+
+
+
+​    ——— 时2019年7月14日下午14:07 竣工于帝都望京
