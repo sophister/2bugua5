@@ -95,9 +95,9 @@ setProgress({pullDistance, percent}){}
 
 
 
-最后，听说，微交互动画，使用 `lottie` 和 RN 更配哦。
+最后，听说，**微交互动画**，使用 [lottie](https://github.com/react-native-community/lottie-react-native) 和 RN 更配哦。
 
-本来想尝试用 AE 整个公司logo的 `lottie` 动画的，奈何没hold住……
+本来想尝试用 AE 做一个公司logo的 `lottie` 动画的，奈何没hold住……
 
 完整的代码在github上：[https://github.com/sophister/react-native-pull-to-refresh-custom](https://github.com/sophister/react-native-pull-to-refresh-custom) 。
 
