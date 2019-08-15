@@ -1,21 +1,5 @@
 # [日积跬步]系列之2019年
 
-## 20190812
-
-### Animated.Value 绑定的对应组件unmount时，动画会被停止
-
-比如有 **一个** 加载中的旋转loading，会一直旋转，如果某一刻，这个组件被 `unmount` 了，对应的 `Animated.Value` 的动画会停止。可以参考这个 expo: [https://snack.expo.io/@sophister/animated-stop-on-unmount](https://snack.expo.io/@sophister/animated-stop-on-unmount)
- 也可以参考这个 issue [https://github.com/facebook/react-native/issues/19826](https://github.com/facebook/react-native/issues/19826) ，里面有提到，当组件unmount的时候，会调用对应 `Animated.Value` 的停止方法
-
-如果同一个 `Animated.Value`  被绑定到了 **多个** 组件上，那么在 **最后一个** 组件 `unmount` 的时候，会停止该 `Animated.Value` 的动画。可以参考这个 expo demo：[https://snack.expo.io/@sophister/animated-stop-multiple-unmount-test](https://snack.expo.io/@sophister/animated-stop-multiple-unmount-test)
-
-## 20190814
-
-`React Native` 中使用 `gif` 动画图片
-
-根据RN官方文档，Android下只是单独加一个包就可以了，加上之后，gif动画只执行了 **一次** ！但是在 `macOS`里预览图片时，是一直在重复执行动画的……找了半天，后来尝试把图片扔到chrome里，发现也不行，也只执行了一次动画。
-猜想gif图片是不是有一些 *元数据* ，里面有字段来表示动画次数之类的，Google之后发现确实有个 `animation count`之类的字段。原来，这次UE给的gif图，在导出时没有设置动画次数，因此，在RN和chrome里只执行了一次动画
-
 ## 20190815
 
 `React Hooks` 中 `useEffect` 和 `useLayoutEffect` 差别
@@ -32,3 +16,21 @@
 
 * [https://blog.logrocket.com/useeffect-vs-uselayouteffect/](https://blog.logrocket.com/useeffect-vs-uselayouteffect/)
 * [https://kentcdodds.com/blog/useeffect-vs-uselayouteffect/](https://kentcdodds.com/blog/useeffect-vs-uselayouteffect/)
+
+
+## 20190814
+
+`React Native` 中使用 `gif` 动画图片
+
+根据RN官方文档，Android下只是单独加一个包就可以了，加上之后，gif动画只执行了 **一次** ！但是在 `macOS`里预览图片时，是一直在重复执行动画的……找了半天，后来尝试把图片扔到chrome里，发现也不行，也只执行了一次动画。
+猜想gif图片是不是有一些 *元数据* ，里面有字段来表示动画次数之类的，Google之后发现确实有个 `animation count`之类的字段。原来，这次UE给的gif图，在导出时没有设置动画次数，因此，在RN和chrome里只执行了一次动画
+
+
+## 20190812
+
+### Animated.Value 绑定的对应组件unmount时，动画会被停止
+
+比如有 **一个** 加载中的旋转loading，会一直旋转，如果某一刻，这个组件被 `unmount` 了，对应的 `Animated.Value` 的动画会停止。可以参考这个 expo: [https://snack.expo.io/@sophister/animated-stop-on-unmount](https://snack.expo.io/@sophister/animated-stop-on-unmount)
+ 也可以参考这个 issue [https://github.com/facebook/react-native/issues/19826](https://github.com/facebook/react-native/issues/19826) ，里面有提到，当组件unmount的时候，会调用对应 `Animated.Value` 的停止方法
+
+如果同一个 `Animated.Value`  被绑定到了 **多个** 组件上，那么在 **最后一个** 组件 `unmount` 的时候，会停止该 `Animated.Value` 的动画。可以参考这个 expo demo：[https://snack.expo.io/@sophister/animated-stop-multiple-unmount-test](https://snack.expo.io/@sophister/animated-stop-multiple-unmount-test)
