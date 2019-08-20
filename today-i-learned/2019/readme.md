@@ -6,6 +6,15 @@
 
 今天看之前native同学写的 node api接口，发现里面用到了 `string` 的一个 `repeat` 方法，返回将字符串重置N(N >= 0)次的一个新字符串。
 
+```javascript
+'abc'.repeat(-1);   // RangeError
+'abc'.repeat(0);    // ''
+'abc'.repeat(1);    // 'abc'
+'abc'.repeat(2);    // 'abcabc'
+'abc'.repeat(3.5);  // 'abcabcabc' (count will be converted to integer)
+'abc'.repeat(1/0);  // RangeError
+```
+
 [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat)
 
 
