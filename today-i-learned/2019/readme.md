@@ -1,5 +1,14 @@
 # [日积跬步]系列之2019年
 
+## 20190820
+
+`String.prototype.repeat`
+
+今天看之前native同学写的 node api接口，发现里面用到了 `string` 的一个 `repeat` 方法，返回将字符串重置N(N >= 0)次的一个新字符串。
+
+[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat)
+
+
 ## 20190815
 
 `React Hooks` 中 `useEffect` 和 `useLayoutEffect` 差别
