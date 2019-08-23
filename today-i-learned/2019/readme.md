@@ -1,5 +1,16 @@
 # [日积跬步]系列之2019年
 
+
+## 20190823
+
+`React Native` (版本：0.59.3) 里， `View.measure(callback)` 拿到的结果是 `undefined`。但是 `View.onLayout` 可以拿到正确尺寸。要修复 `View.measure`返回 `undefined`的问题，有以下两个hack：
+
+* 在 View 上设置 `onLayout`，比如空的占位函数 `onLayout={() => {}}`
+* 在 View 上设置 `collapsable={false}`
+
+根据 [collapsable](https://facebook.github.io/react-native/docs/view#collapsable)文档，猜测返回 `undefined` 的情况下，对应的 View 在native里被优化掉了……而添加上述的属性，应该都可以避免 View 被native优化掉吧
+
+
 ## 20190820
 
 `String.prototype.repeat`
