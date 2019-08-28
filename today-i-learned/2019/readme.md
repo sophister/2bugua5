@@ -1,6 +1,26 @@
 # [日积跬步]系列之2019年
 
 
+## 20190828
+
+`Typescript`里定义 `async` 函数的类型
+
+```javascript
+// *错误* 的写法
+interface WrongWay {
+    func: async () => string;
+}
+
+// *正确*的写法
+interface RightWay {
+    func: () => Promise<string>;
+}
+```
+
+只需要将函数的 **返回值** 定义为 `Promise`，这个函数就 **满足** 了 `async` 函数的要求。毕竟从结果上看，`async`函数和普通函数的区别，只是返回的是 `Promise`，在调用的时候可以加上 `await`，调用方并不关心函数是否是 `async` 的，只关心返回值是 `Promise` 就行了。
+
+BTW，今天正好是到公司的4周年了😅
+
 ## 20190823
 
 `React Native` (版本：0.59.3) 里， `View.measure(callback)` 拿到的结果是 `undefined`。但是 `View.onLayout` 可以拿到正确尺寸。要修复 `View.measure`返回 `undefined`的问题，有以下两个hack：
