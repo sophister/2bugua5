@@ -10,6 +10,11 @@
 * `Object.getOwnPropertySymbols(obj)`: 返回所有 **Symbol** 类型的键
 * `Reflect.ownKeys(obj)`: 返回所有的键，包括 **Symbol** 和 **字符串** 类型的，包括不可枚举的，等价于 `Object.getOwnPropertyNames(target).concat(Object.getOwnPropertySymbols(target))`
 
+参考链接
+
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect/ownKeys
+
 
 ## 20190901
 
