@@ -1,6 +1,16 @@
 # [日积跬步]系列之2019年
 
 
+## 20190902
+
+`JavaScript` 中获取某个对象键的方法
+
+* `Object.keys(obj)`: 返回 **可枚举** 的 **字符串** 键，不包含 `Symbol`类型的键
+* `Object.getOwnPropertyNames(obj)`: 返回所有的 **字符串** 类型的键，不包含 `Symbol`类型的键
+* `Object.getOwnPropertySymbols(obj)`: 返回所有 **Symbol** 类型的键
+* `Reflect.ownKeys(obj)`: 返回所有的键，包括 **Symbol** 和 **字符串** 类型的，包括不可枚举的，等价于 `Object.getOwnPropertyNames(target).concat(Object.getOwnPropertySymbols(target))`
+
+
 ## 20190901
 
 **递归拷贝某些后缀的文件到另外一个目录**
