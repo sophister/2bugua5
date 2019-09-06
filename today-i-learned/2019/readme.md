@@ -1,6 +1,19 @@
 # [日积跬步]系列之2019年
 
 
+## 20190905
+
+`Redis`报错: **ERR max number of clients reached**
+
+昨天测试环境遇到了redis最大连接数超出限制的问题，因为我们 `node.js` 代码里在进程退出的时候，**没有** 主动关闭redis的连接，怀疑可能是这个导致的。但是线上redis没发现这个问题……
+
+根据 [redis文档](https://redis.io/topics/clients)，在 `3.2`版本之后，redis默认开启了 TCP 的 `keepalive` 配置，并且默认检查的时间设置为 **300秒** (通常Linux服务器默认检查时间是 **7200秒** )
+
+看了下测试环境的redis版本，`3.0.3`，好吧，这个版本没有默认开启 `keepalive`，并且也不会检查客户端连接的超时(`timeout`设置为`0`)。
+
+Whatever，还是应该在应用层做一些 *优雅退出* 的操作，关闭掉相关的数据库连接。
+
+
 ## 20190902
 
 `JavaScript` 中获取某个对象键的方法
