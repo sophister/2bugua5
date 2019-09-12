@@ -1,6 +1,34 @@
 # [日积跬步]系列之2019年
 
 
+
+## 20190912
+
+`JavaScript`中实例 **不能** 覆盖`prototype`上带有 `getter/setter` 的属性
+
+```javascript
+function Test(){}
+Test.prototype.a = 'a-in-proto';
+Object.defineProperty(Test.prototype, 'b', {
+    get: function(){ return 'b-getter-proto';}
+});
+var obj = new Test();
+
+obj.hasOwnProperty('a');  // false
+obj.a = 'a-from-instance';
+console.log(obj.a);       //  "a-from-instance"
+obj.hasOwnProperty('a');  // true
+
+obj.b = 'b-from-instance';
+console.log(obj.b);       // "b-getter-proto"
+obj.hasOwnProperty('b');  // false
+```
+
+通常情况下，可以给实例动态增加属性，如何实例的 `__proto__` 上包含了同名属性，那么访问该属性的时候会返回实例上的值。但是，如果这个同名的属性在 `__proto__` 上定义了 `getter/setter`，那么实例不能增加同名的属性。
+
+[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain)
+
+
 ## 20190905
 
 `Redis`报错: **ERR max number of clients reached**
