@@ -1,6 +1,27 @@
 # [日积跬步]系列之2019年
 
 
+## 20190926
+
+**iOS 12 UIWebView 不缓存背景图片**
+
+有这样一个场景，我们有个弹窗，弹窗内容有一张背景图片，理论上，背景图片只应该在第一次展示的时候请求一次，在**不关闭** 页面的情况下，后续展示这张背景图片浏览器都会使用内存缓存，**不会**发起额外的http去请求这张图片。
+
+在chrome和Safari上，确实符合预期。但是在APP里的 `UIWebView`，发现每次显示弹窗的时候，都会重新去请求背景图片，导致每次都会闪现，用户体验不理想。
+
+经过这个测试页面  [https://jsbin.com/pidahiy/17/edit?js](https://jsbin.com/pidahiy/17/edit?js)  ，基本可以得出以下结论(**都是针对iOS12的 UIWebView**)：
+
+* UIWebView 不缓存 `background-image` 这样的背景图片
+* UIWebView 会缓存 `<img />` 标签加载的图片
+* 可以通过持有一个图片的对象，来使得 UIWebView 缓存 `background-image`
+
+比如，我们可以在 `window` 上挂载一个全局变量，来缓存某个URL对应的图片
+
+```javascript
+window.imageForceCache = new Image();
+window.imageForceCache.src = 'https://xx.com/some/url/to/image';
+```
+
 
 ## 20190912
 
@@ -70,7 +91,7 @@ Whatever，还是应该在应用层做一些 *优雅退出* 的操作，关闭�
 最后发现用 `rsync` 命令可以很方便的实现，命令如下：
 
 ```shell
-rsync -rv --exclude='*.html'  ./A/ ./B/
+rsync -arv --exclude='*.html'  ./A/ ./B/
 ```
 
 
