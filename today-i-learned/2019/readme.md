@@ -1,6 +1,25 @@
 # [日积跬步]系列之2019年
 
 
+## 20191008
+
+**HTML A标签的ping属性**
+
+最近看到一篇文章，说是有攻击者利用 `HTML` 的 `a` 标签的 `ping`属性，发起 `DDOS`攻击。
+
+好像从没听说过 a 标签还有 `ping` 这么个属性呢😅
+
+根据 [MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a) 文档，这个 ping 属性，值可以是 **空格分隔的多个URL**，当用户点击A标签时，浏览器会自动 **POST** 请求该标签的 ping 属性里所有的URL。
+
+```html
+<a href="javascript:void(0);" ping="https://www.qq.com/ https://www.baidu.com/">with multipe ping attribute</a>
+```
+
+点击上面的A标签，虽然没有实际的页面跳转，浏览器仍然会给 ping 对应的 **2个** URL发起 **POST** 请求。
+
+demo页面：[https://output.jsbin.com/dowoqir](https://output.jsbin.com/dowoqir)
+
+
 ## 20190926
 
 **iOS 12 UIWebView 不缓存背景图片**
