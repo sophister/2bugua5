@@ -1,8 +1,39 @@
 # 前端面试题集
 
+
+
+参考资料：
+
+* [https://github.com/yangshun/front-end-interview-handbook](https://github.com/yangshun/front-end-interview-handbook) 
+
+
+
 ## TOC
 
 ## HTML
+
+
+
+### 浏览器的同源策略及跨域
+
+同源策略：
+
+如果两个URL包含相同的 协议、端口和主机名，那么这两个URL属于同源。相反，[协议，端口，主机名]三元组中的任何一个不同，都属于不同的源。
+
+跨域：
+
+默认情况加，Ajax中，浏览器会限制JavaScript去请求不同源的数据。
+
+浏览器允许跨域的情况：`<script>`标签，`<img />`，`<iframe>`等
+
+怎么解决跨域：
+
+* JSONP 请求，利用 `<script>`标签可以跨域
+* 反向代理
+* CORS
+* iframe通信，使用 postMessage
+
+
 
 ## CSS
 
@@ -14,10 +45,16 @@
 
 * 块级元素的大小由`width`、`height`、`padding`、`border`和`margin`决定。
 * 默认情况下，`padding`和`border`不是元素`width`和`height`的组成部分
+
+
+
+box-sizing: 
+
 * 元素默认应用了`box-sizing: content-box`，元素的宽高只会决定内容（content）的大小。
-* `box-sizing: border-box`改变计算元素`width`和`height`的方式，`border`和`padding`的大小也将计算在内。
-* 元素的`height` = 内容（content）的高度 + 垂直方向的`padding` + 垂直方向`border`的宽度
-* 元素的`width` = 内容（content）的宽度 + 水平方向的`padding` + 水平方向`border`的宽度
+
+* `box-sizing: border-box`改变计算元素`width`和`height`的方式，`border`和`padding`的大小也将计算在内: 
+  * 元素的`height` = 内容（content）的高度 + 垂直方向的`padding` + 垂直方向`border`的宽度
+  * 元素的`width` = 内容（content）的宽度 + 水平方向的`padding` + 水平方向`border`的宽度
 
 参考 [https://zhuanlan.zhihu.com/p/63962882](https://zhuanlan.zhihu.com/p/63962882) 
 
@@ -55,6 +92,8 @@
 * inline-block:
 * none:
 * flex:
+
+参考 [https://developer.mozilla.org/en-US/docs/Web/CSS/display](https://developer.mozilla.org/en-US/docs/Web/CSS/display) 
 
 
 
@@ -170,6 +209,34 @@ function parseQuery(queryString) {
     return query;
 }
 ```
+
+
+
+###  实现 Promise.all 方法
+
+
+
+```javascript
+if(!Promise.all){
+  Promise.all = function(arr){
+    return new Promise(function(resolve, reject){
+      let remain = arr.length;
+	    const out = new Array(arr.length);
+      arr.forEach(function(p, index){
+        p.then(function(res){
+          out[index] = res;
+          remain--;
+          if (remain === 0) {
+            resolve(out);
+          }
+        }).catch(reject);
+      });
+    });
+  };
+}
+```
+
+
 
 
 
