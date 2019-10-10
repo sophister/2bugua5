@@ -38,6 +38,8 @@ declare module 'koa' {
 
 demo页面：[https://output.jsbin.com/dowoqir](https://output.jsbin.com/dowoqir)
 
+*注意*：正是由于`ping`这个属性存在潜在的安全风险，已经从规范上删除了，部分浏览器默认也是禁用了这个属性的。
+
 
 ## 20190926
 
