@@ -1,6 +1,25 @@
 # [日积跬步]系列之2019年
 
 
+## 20191010
+
+**TypeScript扩展其他模块**
+
+在使用 `koa` 时，我们会给 `context` 上增加很多业务字段、方法。简单地给 `context` 上增加这些属性，TS并不能识别到，需要我们单独声明这些新的属性、方法：
+
+```typescript
+import { Logger } from 'some-logger';
+declare module 'koa' {
+    interface Context {
+        // 给 koa 中的 Contxt 增加一个logger属性
+        logger: Logger;
+    }
+}
+```
+
+参考链接 [https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation)
+
+
 ## 20191008
 
 **HTML A标签的ping属性**
