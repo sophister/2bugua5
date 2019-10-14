@@ -1,6 +1,36 @@
 # [日积跬步]系列之2019年
 
 
+## 20191014
+
+**GraphQL中定义Query的坑**
+
+`GraphQL`中的 `Query`，可以带参数，也可以不带。如果没有参数，那么，在定义时，**不能** 加括号！！
+
+```graphql
+type Product {
+    name: String
+}
+
+type Query {
+    # 下面这个没问题
+    product: Product
+    # 下面这个 Query，加了 括号，但是没有参数，编译会报错！
+    test(): Product
+}
+```
+
+上面这个情况，**不带参数** 的 `Query`，定义的时候 **不能** 加括号！
+
+如果加了括号，会提示这个错误：
+
+```text
+Syntax Error: Expected Name, found )
+```
+
+[相关链接](https://stackoverflow.com/questions/52769993/how-to-correctly-declare-a-graphql-query-without-parameters)
+
+
 ## 20191010
 
 **TypeScript扩展其他模块**
