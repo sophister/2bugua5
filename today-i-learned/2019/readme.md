@@ -1,6 +1,37 @@
 # [日积跬步]系列之2019年
 
 
+## 20191017
+
+**TypeScript 中Union联合类型casting**
+
+TS中，一个变量的类型确定之后(不是Union类型)，就 **不能** 修改这个变量的类型了！
+
+但是我们可以把一个 `Union` 类型的变量，缩小到 `Union` 中的某个具体的类型。但是，类型cast之后的结果，不一定是 **一个** 具体类型，有可能还是 `Union` 类型！看下面的例子：
+
+```typescript
+interface Item {
+    name: string
+}
+
+interface WithFoo {
+    name: string;
+    foo?: string;
+}
+
+function addProp(obj: Item | WithFoo) {
+    // 经过下面的转换之后，obj 的类型 **仍然** 是 Item | WithFoo
+    obj = obj as WithFoo;
+    // 下面这行会报错！
+    obj.foo = 'hello';
+}
+```
+
+在`Union`类型cast语句 `T = S` 中，针对 T 中每一个 类型 U，如果 `U = S` 合法，那么最终的类型会是满足条件的 U 组成的新的 `Union` 类型！
+
+参考链接 [https://stackoverflow.com/questions/58392378/typescript-type-cast](https://stackoverflow.com/questions/58392378/typescript-type-cast)
+
+
 ## 20191014
 
 **GraphQL中定义Query的坑**
