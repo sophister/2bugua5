@@ -219,7 +219,94 @@ assert(y2k.millisecondsSinceEpoch == 946684800000);
 
 ## dart:async 异步编程
 
+dart提供了两个和异步编程相关的类 `Future` 和 `Stream` 。
 
+`Future` 就是JS里的 `Promise`，换了身马甲而已，也是 `then()` 方法来注册异步回调拿结果，使用 `catchError()` 来捕获异常(也是换了个名字)。也提供了并发等待多个异步回调结果的 `Future.wait([])` ，和JS里的 `Promise.all()` 看上去没有任何区别。
+
+同样，在JS里，有了 `async`  `await`  之后，就 **不推荐** 使用 `Promise.then` 方法来异步编程了；在 dart里，也推荐使用 `async`  `await`  来异步编程，不直接使用 `Future.then` 。
+
+dart里的 `Stream` ，一方面和 `node.js`  里的 `stream` 类似，比如读取文件流；另一方面，在 `DOM` 操作上，对应的绑定事件也是流，可以认为DOM会异步的触发这些事件。比如
+
+```dart
+// 绑定某个元素的点击事件, onClick 属性就是一个 Stream
+querySelector('#submitInfo').onClick.listen((e) {
+  // When the button is clicked, it runs this code.
+  submitData();
+});
+
+// 读取文件流中，Stream 的使用
+Future readFileAwaitFor() async {
+  var config = File('config.txt');
+  Stream<List<int>> inputStream = config.openRead();
+
+  var lines = inputStream
+      .transform(utf8.decoder)
+      .transform(LineSplitter());
+  try {
+    await for (var line in lines) {
+      print('Got ${line.length} characters from stream');
+    }
+    print('file is now closed');
+  } catch (e) {
+    print(e);
+  }
+}
+```
+
+
+
+## dart:math 数学以及随机数
+
+`dart:math` 库提供一些列的数学相关的函数以及常量，比如 `sin()` `cos()`  `max()` `min()` 函数，还有常量 `pi`  `e`  `sqrt2`  。不太理解的是，为什么这些函数以及常量都是 **全局** 的，窃以为像JS里都放在 `Math` 类下更优雅一点吧。
+
+可以通过 `Random` 类来产生随机数、随机bool值。像下面这样
+
+```dart
+var random = Random();
+random.nextDouble(); // 在[0, 1)之间随机生成浮点数(注意是 **左闭右开** 区间)
+random.nextInt(10); // 在 [0, 9] 之间随机生成int
+random.nextBool(); // 随机产生 true 或者 false
+```
+
+
+
+## dart:convert 编码、解码相关
+
+`dart:convert` 库包含了对 `JSON` `UTF-8` 等的编码、解码的支持。
+
+使用 `jsonDecode()` 将一个JSON字符串解码为dart的对象，可能是 `list`  `map`  等。
+
+使用 `jsonEncode()` 将dart的对象转化成JSON字符串。注意，只有这些类型可以直接转换成JSON字符串： `int`  `double`  `String`  `bool`  `null`  `List`  `Map`(key是string类型的时候)。对于其他dart对象，调用 `jsonEncode` 转换JSON字符串时，可以提供额外的一个 `encode()` 函数作为第二个参数，这个函数返回上面几种可以直接转换的类型之一；如果没有提供 `encode` 作为第二个参数，那么系统会调用对象的 `toJson()` 方法（这个和JS里是类似的吧）。
+
+别的针对 `UTF-8` 的操作，包括 `utf8.decode()`  `utf8.encode()`  ，先跳过吧。
+
+
+
+## dart:html 开发web应用
+
+`dart:html` 库是开发 **web** 应用的，先跳过吧，毕竟看dart，也不是为了开发webapp ……
+
+
+
+## dart:io IO操作
+
+`dart:io` 库提供一些列的API，用来操作 文件、目录、进程、sockets、WebSockets、以及http客户端和服务器。
+
+库提供的大部分API都是异步的，和 `Node.js` 一样，针对个别同步接口，会在对应函数名加上 `Sync` 后缀来标示。
+
+读取文件内容有2种方式：一次性全部读取、通过 `Stream` 来读取。如果要一次性全部读取，必须保证有足够的内存能够存储文件内容。
+
+通过 `File` `Directory` 这两个类分别操作 文件和目录。
+
+dart还可以搭建server端，通过 `HttpServer`  `HttpRequest` 类，可以启动server端，处理http请求。
+
+如果是要主动发送http请求，就要用到 `HttpClient` 类。
+
+
+
+## 最后
+
+大概过完了，继续看后面还有啥吧
 
 
 
