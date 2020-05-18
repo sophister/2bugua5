@@ -2,6 +2,64 @@
 
 
 
+## 20200518
+
+**macOS Catalina 10.15.4系统下git pull/push 卡住的问题**
+
+上周不小心升级到了最新的 `macOS Catalina 10.15.4` 版本，升级之后，发现 `git` 相关命令(`git pull`  `git push`等)经常卡住没有反应，重启系统之后又恢复正常，但是过几天又异常……
+
+但是也只是访问公司的 `gitlab` 会有异常，访问 `github` 完全没问题……
+
+问了周围同事，都是正常的……
+
+后来发现，他们都是使用的 `http` 协议 `clone` 代码，而我是走的 `ssh` 协议。
+
+再对比公司的 `gitlab` 和 外部的`github` 服务，我还是都用的 `ssh` 协议，但是服务的端口不一样！公司的`gitlab` ssh协议的端口不是正常的 `22` 端口，而是一部比较大的值(大于`8192`) ，比如是 `23456` 。
+
+Google之后，终于发现 [这篇stackoverflow](https://apple.stackexchange.com/questions/386821/git-hangs-with-a-ssh-remote-uri-after-10-15-4-update) 和我遇到情况完全一样，升级系统之后，`git` 相关命令无法使用。
+
+根据上面的 stackoverflow 步骤，应该是 macOS 自带的 `/usr/bin/ssh` 有问题，按照如下步骤，安装新的 `ssh` 客户端
+
+```shell
+brew install openssh
+```
+
+安装过程中，可能会遇到如下报错信息
+
+```shell
+Error: The `brew link` step did not complete successfully
+The formula built, but is not symlinked into /usr/local
+Could not symlink sbin/sshd
+/usr/local/sbin is not writable.
+
+You can try again using:
+  brew link openssh
+```
+
+可能是 `/usr/local/sbin` 目录不存在，需要手动创建，并且赋予当前用户权限
+
+```shell
+# 创建目录，如果不存在的话
+sudo mkdir /usr/local/sbin
+# 修改目录的所有者
+sudo chown -R $(whoami) /usr/local/sbin
+# 重新link
+brew link openssh
+```
+
+最后，记得确保 `/usr/local/bin` 在你的 `PATH` 环境变量靠前的位置。
+
+记录下 macOS 的 ssh 和 brew 安装的 openssh 版本信息的差异吧
+
+```shell
+jess@jessedeMacBook-Pro ~ % /usr/bin/ssh -V
+OpenSSH_8.1p1, LibreSSL 2.7.3
+jess@jessedeMacBook-Pro ~ % /usr/local/bin/ssh -V
+OpenSSH_8.2p1, OpenSSL 1.1.1g  21 Apr 2020
+```
+
+
+
 ## 20200506
 
 **Java中的 int == Integer 比较**
