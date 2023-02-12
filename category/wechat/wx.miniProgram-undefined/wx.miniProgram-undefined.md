@@ -2,6 +2,10 @@
 
 
 
+关键字：**微信小程序** 、`web-view` 、`腾讯地图API` 、`wx.miniProgram undefined` 。
+
+
+
 ## 背景
 
 在微信小程序里，我们除了tab页等是原生页面，其他都是使用 `webview` 渲染的H5页面。在微信小程序里，部分H5需要设置用户分享出去的卡片title和图片，因此，我们会在H5里通过调用 `wx.miniProgram.postMessage` 把分享数据 **异步** 发送给小程序端，在小程序端的 `onShareAppMessage` 将收到的分享数据返回给微信端。
