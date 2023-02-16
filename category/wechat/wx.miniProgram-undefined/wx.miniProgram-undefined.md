@@ -107,3 +107,32 @@ OK，通过测试，发现1.2的JS不会加载了，自定义分享功能恢复�
 
 
 ​                                                    ---------时2023年2月10日 竣工于成都天府五街
+
+
+
+## Update: 冤枉微信SDK了
+
+在后来 `code review` 时，发现其他组内也同时使用了 微信SDK和腾讯地图SDK，但是始终没问题。
+
+于是进一步 `debug`，发现微信SDK内，其实是有判断的，如果当前页面已经加载了SDK，就不会覆盖之前的SDK，代码截图如下：
+
+![](./wechat-sdk-check.png)
+
+
+
+因此，最终解决方案只需要把 1.6版本的SDK对应script，移动到腾讯地图SDK加载之前，就可以了，如下：
+
+```html
+<script src="//res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+<!--  腾讯地图  -->
+<script charset="utf-8" src="https://apis.map.qq.com/tools/geolocation/min?key=&referer=="></script>
+<script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key="></script>
+```
+
+
+
+其实这也是最理想的方式，由SDK内部来判断，是否应该覆盖掉已有版本代码，因为SDK提供者才清楚知道各个版本SDK的差异，应该怎样覆盖或者合并最合适。
+
+
+
+​                                                   
