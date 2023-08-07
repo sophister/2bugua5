@@ -2,6 +2,35 @@
 
 
 
+## 20230807 https页面请求http://localhost
+
+
+
+最近遇到一个场景，浏览器里web页面需要和 `http://localhost:8000` 电脑本地服务进行数据交互，最开始浏览器里页面也是 `http://` 协议的，请求本地的 `http://` 服务配置上允许跨域之后，没问题。
+
+后来为了安全（用的[自签名证书](https://learn.microsoft.com/zh-cn/azure/application-gateway/self-signed-certificates)），浏览器里需要升级成 `https://` 协议，在评估的时候，我想电脑本地的服务也需要升级成 `https://` 协议的，比如这样`https://localhost:8000,` ，如果不升级的话，应该会被浏览器判定为 [Mixed Content](https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content) ，应该会被**blocked** 掉。
+
+在浏览器里页面升级到 `https://` 之后，实际访问页面时，发现浏览器（Chrome）并没有报 `insecure content was loaded over HTTPS, but requested an insecure resource`，能够正常通过 `ajax` 请求本地的 `http://localhost:8000` 服务获取数据……但是，我页面里请求其他域名下的 `http://` 接口，就被浏览器block了，报了上面这个错误（符合预期）。大概就是下面这样：
+
+* 假设浏览器里页面链接 `https://test.ecool.fun/a.html` 
+* 通过 `ajax`访问用户电脑本地服务 `http://localhost:8000` ，可以正常访问，没有任何报错（为什么没有被阻止掉？）
+* 通过 `ajax` 访问其他在线服务 `http://some.other.com/api` ，被浏览器block掉，不允许发起请求（符合预期）
+
+
+
+### 结论
+
+规范认为，`127.0.0.1` 或者 `localhost` 是可信的域，允许 `https://` 页面请求 `http://127.0.0.1:8000` 或者 `http://localhost:8000` 的服务（**端口只是个例子，随便换个其他端口都可以**）
+
+
+
+参考资料：
+
+* [Is origin potentially trustworthy?](https://w3c.github.io/webappsec-secure-contexts/#is-origin-trustworthy)
+* [Mixed-content request from HTTPS page to HTTP (non-HTTPS) localhost address not blocked](https://stackoverflow.com/questions/60448948/mixed-content-request-from-https-page-to-http-non-https-localhost-address-not)
+
+
+
 ## 20230308 window.innerWidth不可靠
 
 
