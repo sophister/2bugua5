@@ -54,7 +54,7 @@
 
 在微信浏览器环境使用上述demo页面，Android(小米13)和iOS(系统16.2，感谢王大神和强哥的爱疯手机)，都能够正常收到成功的回调函数。
 
-看了下兼容性，还是不错的，https://caniuse.com/?search=watchPosition ，
+看了下兼容性，还是不错的，[https://caniuse.com/?search=watchPosition](https://caniuse.com/?search=watchPosition) ，
 
 ![watchPosition兼容性](./assets/20230818/watchposition-caniuse.png)
 
