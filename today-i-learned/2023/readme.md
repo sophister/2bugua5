@@ -2,6 +2,64 @@
 
 
 
+## 20230818 web监听设备实时定位变化
+
+
+
+有一个需求，需要在web页面里 **实时监听用户定位** ，发现 微信小程序原生是有对应API的，[wx.onLocationChange](https://developers.weixin.qq.com/miniprogram/dev/api/location/wx.onLocationChange.html) ，但我们场景里是一个 H5 页面，于是去微信公众号网页开发里看了下，并没有找到类似的监听实时地理位置变化的API，为什么H5里会没有呢……
+
+原来，浏览器原生已经提供了这个API了 [navigator.geolocation.watchPosition](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition) ，能够实时获取到H5设备的定位变化。
+
+使用也很简单，让GPT写了个demo，实时监听用户定位并且把信息追加到页面上，代码如下：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Real-time Position</title>
+</head>
+<body>
+  <textarea id="position"></textarea>
+
+  <script>
+    const positionTextArea = document.getElementById("position");
+
+    function success(pos) {
+      const crd = pos.coords;
+      const latitude = crd.latitude;
+      const longitude = crd.longitude;
+
+      positionTextArea.value += `Latitude: ${latitude} °, Longitude: ${longitude} °\n`;
+    }
+
+    function error(err) {
+      positionTextArea.value += `Error: ${err.message}\n`;
+    }
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    };
+
+    navigator.geolocation.watchPosition(success, error, options);
+  </script>
+</body>
+</html>
+```
+
+
+
+在线demo链接：[https://output.jsbin.com/vipumas](https://output.jsbin.com/vipumas)
+
+在微信浏览器环境使用上述demo页面，Android(小米13)和iOS(系统16.2，感谢王大神和强哥的爱疯手机)，都能够正常收到成功的回调函数。
+
+看了下兼容性，还是不错的，https://caniuse.com/?search=watchPosition ，
+
+![watchPosition兼容性](./assets/20230818/watchposition-caniuse.png)
+
+
+
 ## 20230807 https页面请求http://localhost
 
 
