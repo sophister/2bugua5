@@ -1,4 +1,4 @@
-#一文读懂HTTP Referer
+#重新认识HTTP Referer
 
 
 
@@ -139,7 +139,7 @@ Referer 头部在网页开发和网络分析中具有重要作用。通过了解
 
 来一张大佬画的图，可能更直观一些：
 
-![](./referrer-policy.avif)
+![](./referrer-policy.png)
 
 > 图片来自https://web.dev/referrer-best-practices/
 
