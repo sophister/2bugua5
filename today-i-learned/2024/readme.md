@@ -2,6 +2,57 @@
 
 
 
+## 2024-05-22 Web音频录制wav&采样率调整
+
+
+
+最近在做一个客服聊天的H5，需要实现在H5页面里用户可以录音识别来提问，通常都是使用 `MediaStream` `AudioContext` 来实现，但是有个问题，我们后端的识别接口只能是 `wav`格式的音频文件并且**采样率**是16000或者8000，Chrome默认的输出音频格式为 `audio/webm` 格式，支持默认调整为 `audio/wav` 格式的，采样率默认的也是 48000（不同机器可能不一样）同样不支持调整。
+
+各种Google之后，发现了这个JS类库：https://github.com/mattdiamond/Recorderjs 。虽然作者一上来就声明了，这个类库已经不再维护了，看最后修改日期，最近都是8年前，确实也没维护了，但只能试试了。
+
+实际使用下来，发现这个类库还是能够完成音频格式转换，从 `audio/webm` 格式转换成  `audio/wav` 格式，大佬写的代码就是健壮啊。
+
+但是，这个类库目前不支持修改 **采样率** ……
+
+因为对音频完全一窍不通，只能继续Google，最终在这个issue里，找到了一位大佬给出的解决方案：https://github.com/mattdiamond/Recorderjs/issues/186#issuecomment-413838080 。
+
+根据网上帖子来看，很多大佬都有修改 **采样率** 的需求，为了方便后人可以用起来更加简单，不必像我这样到处Google各种尝试，我 `fork` 了上面的类库，添加了对输出 **采样率** 的支持，于是有了这个仓库：https://github.com/sophister/recorderjs-ex?tab=readme-ov-file ，对应的 `npm` 包的名字是 `recorderjs-ex` ，简单用法如下：
+
+```javascript
+import Recorder from 'recorderjs-ex';
+
+// initialize the recorder
+const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+const audioContext = new AudioContext({});
+const input = audioContext.createMediaStreamSource(stream);
+const recorder = new Recorder(input, {
+	// we can change the channels, default is 2
+	numChannels: 1,
+});
+
+// start to record
+recorder.record();
+
+// stop to record, maybe user clicks a stop button
+recorder.stop();
+
+// get the audio with the sample rate we want (here is 8000, you can pass 16000)
+recorder.exportWAV((blob: Blob) => {
+	// do something with the blob
+}, 'audio/wav', 8000);
+
+```
+
+
+
+最后，**感谢那些在网上默默奉献的开源代码作者，你们才是最可爱的人**!
+
+
+
+PS：今天在写这篇短文的时候，又Google了一下浏览器里音频录制，发现可以用原生的 `MediaRecorder` 来录音（虽然支持的输出格式也受浏览器限制，目前看仍然不支持 `audio/wav`  `audio/mp3`） ，写了个demo，用起来还是挺简单的：https://jsbin.com/qoyukul/edit?html,js,output
+
+
+
 ## 2024-01-14 transform 元素影响 fixed 子孙元素定位 
 
 
