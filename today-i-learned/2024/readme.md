@@ -2,6 +2,84 @@
 
 
 
+## 2024-06-26 iOS上H5不能用input上传文件，前端改一下吧
+
+
+
+今天突然测试和APP大佬找过来，说我们的H5在iOS系统上（没错，我们是`hybrid`架构），在文件上传的地方会导致APP闪退（`crash`）。真是，人在工位坐，锅从天上来啊。
+
+找到对应H5看了下，页面很简单，使用 `input[type=file]`来让用户选择手机照片或者用相机拍照后上传，没有复杂的功能。我们系统除了在APP，还有微信小程序，所以问了下测试同学，在微信小程序里的H5，图片上传是不是正常的，回答是正常的，而且点击之后，弹出来的那3个系统菜单都和我们APP里一样。H5代码如下：
+
+```html
+<input type="file" accept="image/png, image/jpeg" @change="onFileChange">
+```
+
+因为是在测试一个H5新需求的时候，无意中发现了这个上线很久的功能异常，而且APP大佬还提到一点，即使系统给APP授权了相机拍照权限，在H5里拍照的时候还是会崩。
+
+“这个看来是H5兼容性有问题，不能使用input原生标签，H5页面改成调用APP的桥方法吧”，APP大佬说。
+
+“好的，我看看怎么改下，在iOS里做下兼容，不用原生标签，改成调用APP的桥方法来上传”，负责新需求的前端大佬效率很高，撸起袖子就是干。
+
+虽然被周围大佬们高效的决策和执行力所折服，我还是**总感觉哪里不太对劲**，以前倒是听说过`webview`里使用原生 `input` 标签上传文件存在兼容问题，但印象里都是很多年前了，而且从目前的情况来看，同一个H5页面，在我们APP里不行，在微信小程序的 `WKWebView` 里却可以，有没有可能是我们APP哪儿有幺蛾子呢？
+
+要不，咱写个demo来试试，还是让代码来说话？幸好我这9年的mac还没退休，为了让xcode跑起来，先删出来50GB的系统存储空间，然后再把几年没升级的OSX系统升级到12.7.5。找**ChatGPT**写了个简单的demo：
+
+```swift
+import UIKit
+import WebKit
+
+class WebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
+    
+    var webView: WKWebView!
+    var completionHandler: (([URL]?) -> Void)?
+    
+    override func loadView() {
+        let webConfiguration = WKWebViewConfiguration()
+        // Enable JavaScript
+        webConfiguration.preferences.javaScriptEnabled = true
+        
+        // Enable localStorage
+        webConfiguration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
+        webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        webView.uiDelegate = self
+        webView.navigationDelegate = self
+        view = webView
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        if let filePath = Bundle.main.path(forResource: "index", ofType: "html") {
+            let fileURL = URL(fileURLWithPath: filePath)
+            webView.loadFileURL(fileURL, allowingReadAccessTo: fileURL)
+        }    
+
+    }
+}
+```
+
+HTML代码如下：
+
+```html
+<input type="file" accept="image/png, image/jpeg" />
+```
+
+
+
+拿出尘封了8年的iPhone7，充上电，还能跑😲。
+
+
+
+从真机运行结果来看，**不管是从相册选取照片、还是拍照（包括前后镜头），`WKWebView` 都是支持的**，至少在我测试的这个iOS系统版本（**15.7.1**）上工作良好，并没有崩溃的问题，原生标签在选择图片之后，还贴心的把一个预览小图放在了 `input` 的右侧🤣
+
+
+
+作为一名码农，经常会被人要求执行力，仿佛不管啥需求扔过来，我们要第一时间按照别人指示开干，执行力就强，输出爆表。接触过一些同学，确实执行力很强，需求还没讲完可能都写了几十行代码了。私以为，肯实干是好事，但也不能少了 **质疑&调研** 的能力，特别是一些大家可能都不是太懂的场景，更需要我们有质疑的能力，为什么要这样做，是否合理。
+
+身为一名页面仔，在 `hybrid APP`架构中，经常听到“这个东西原生做要发版，H5做一下兼容吧”、“两端实现有点区别，H5里兼容下吧，成本不大”等等，怎么说呢，倒不是不能帮忙擦屁股，但擦屁股频率太高了，会不会把腚给擦坏了啊，毕竟H5可不知道原生适合的力度啊😂
+
+
+
 ## 2024-05-22 Web音频录制wav&采样率调整
 
 
