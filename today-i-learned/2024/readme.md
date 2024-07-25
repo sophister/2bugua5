@@ -2,6 +2,49 @@
 
 
 
+## 2024-07-24 JS文件上传，中文文件名乱码
+
+
+
+最近遇到一个问题，用 `antd`做了个文件上传功能，服务端是 `express.js` ，使用了 `multer` 来实现node里的文件上传功能。功能都正常，直到后端大佬说收到的文件名是乱码的，因为他传了一个 **文件名里带中文的文件** 。
+
+之前也用node搞过文件上传，所以我直觉上想是不是后端上传文件的姿势不对，下次趴着试试🙄……随便找个中文的文件名来上传，确实看到服务端文件名乱码了，甚至趴着上传也不行🤣
+
+THRER MUST BE SOMETHING WRONG
+
+作为专业的面向Google工程师，果断开始找Google要答案。
+
+原来这算是 `multer` 这个类库里的一个bug，它本身使用了另外一个类库 `busboy` 来解析 `multipart/form-data` 的请求数据，这个类库本身是支持解析 **utf-8** 的文件名的，只是 `multer` 在使用时并没有加上对应参数，可以参考这个 `PR`: https://github.com/expressjs/multer/pull/1210 。但不知道是不是 `multer` 作者去度蜜月了，这个PR已经超过1年了，还是**没有**合并……
+
+问题没修复，打工人还得搬砖，还好在这个issue下面（https://github.com/expressjs/multer/issues/962），好心人给出了临时的解决方案：
+
+```javascript
+// 这里假设上传了多个文件
+req.files[0].originalname = Buffer.from(req.files[0].originalname, 'latin1').toString('utf-8');
+```
+
+
+
+**总结一句**，上面这个文件名乱码的原因，就是请求时给后端的是 `utf-8` 编码的文件名，但是后端（在这里是 `nodejs`）在解析文件名时，是以 `ISO-8859-1` 编码来解析的，所以出现了乱码。
+
+
+
+在这个 RFC6266 的文档里，（https://datatracker.ietf.org/doc/html/rfc6266#section-5），还给出了一种新的带编码说明的请求格式，然而 JavaScript 里不能手动设置，在其他场景倒是可以试试：
+
+```
+Content-Disposition: attachment;
+                          filename="EURO rates";
+                          filename*=utf-8''%e2%82%ac%20rates
+```
+
+
+
+写了个demo，可以用来复现 `express.js` 配合 `multer` 的文件上传，中文名乱码问题，在这个仓库：https://github.com/sophister/multipart-utf8-filename-demo
+
+
+
+
+
 ## 2024-06-26 iOS上H5不能用input上传文件，前端改一下吧
 
 
