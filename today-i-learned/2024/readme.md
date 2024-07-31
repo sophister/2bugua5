@@ -2,6 +2,98 @@
 
 
 
+## 20240731浏览器画中画API(document-picture-in-picture)
+
+今天在看一个微信文档的时候，看到视频下方的按钮中，有一个奇怪的icon，hover上去显示的是 *PiP mode* ，感觉很深不可测的样子。点击之后，视频出现在单独的一个小窗口中，并且悬浮在其他窗口上方，这就是传说中的 **画中画** 么。
+
+这个API名称也很直接，就叫 **Document Picture-in-Picture API** 。API文档可以参考下面的官方文档，用法还是比较简单：
+
+```javascript
+async function enterPiPMode() {
+    if (! ('documentPictureInPicture' in window) ) {
+      // 检测当前浏览器是否支持 普通元素 的画中画
+      alert('Picture-in-Picture is not supported in your browser.');
+      return;
+    }
+    const pipOptions = {
+      // 下面两个配置，在官方文档没找到
+			initialAspectRatio: 5 / 4,
+			lockAspectRatio: true,
+      
+			disallowReturnToOpener: true,
+		};
+
+		pipWindow = await documentPictureInPicture.requestWindow(pipOptions);
+      // 赋值主页面的样式到独立的画中画window中
+		[...document.styleSheets].forEach((styleSheet) => {
+			try {
+				const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join("");
+				const style = document.createElement("style");
+
+				style.textContent = cssRules;
+				pipWindow.document.head.appendChild(style);
+			} catch (e) {
+				const link = document.createElement("link");
+
+				link.rel = "stylesheet";
+				link.type = styleSheet.type;
+				link.media = styleSheet.media;
+				link.href = styleSheet.href;
+				pipWindow.document.head.appendChild(link);
+			}
+		});
+    // 把目标元素挂载到画中画的body上
+    pipWindow.document.body.append(con);
+    // 这里其实可以用画中画的body上挂载更多的html元素，比如添加一些自己的按钮之类的
+  }
+```
+
+
+
+**注意**，由于我们之前是把源DOM挂载到了画中画窗口，在退出画中画模式的时候，需要找到源DOM的父节点，重新把源DOM挂载回本来的位置上。
+
+**另外**，进过我的demo测试，画中画的 `pipWindow` 不能重复使用，每次进入都需要新生成一个，不知道是不是使用姿势不太对，而且官方文档也提到了上面把 `CSS` 样式从源文档复制到画中画也是一次性的。
+
+
+
+写了个简单的demo，演示把一个 `div` 元素在画中画和源文档中进行切换：https://output.jsbin.com/xayejew
+
+
+
+Google文档上放了这个demo(https://lazy-guy.github.io/tomodoro/index.html)，还比较好看，[源码](https://github.com/lazy-guy/tomodoro/blob/main/index.js#L1579)也可以参考下，截图吐下：
+
+![画中画demo示例截图](./assets/pip-shot.png)
+
+
+
+### 使用场景
+
+这个API最初就是从 `video` 标签的画中画API进化来的，所以最大的应用场景还是视频的画中画功能吧，类似B站或者油管之类的。
+
+在一些有复杂表单的web页面，可能数据会分在多个页面里或者多个子步骤中，我想在这种场景，也有一定用处，可以让用户不用来回切换tab页，把当前页面所需要的一些 *上下文* 信息用画中画形式悬浮在桌面上，能带来使用上的一些便捷。
+
+
+
+### 使用限制
+
+画中画窗口类似于通过 Window.open() 打开的 **同源** 空白窗口，但有一些区别：
+
+- 画中画窗口浮在其他窗口之上。
+- 画中画窗口不会超过打开窗口的生命周期，主页面关闭（或者reload），画中画窗口都会关闭。
+- 画中画窗口不能进行导航。
+- 网站无法设置画中画窗口位置。
+- 每个浏览器选项卡最多只能有一个画中画窗口，用户代理可能进一步限制全局打开的画中画窗口数量。我测试的结果是，**Chrome只允许一个画中画窗口，这是全部标签页共享的** ，当在第二个标签页打开画中画时，如果之前已经有打开画中画，那之前的画中画会关闭。
+
+
+
+### 参考文档
+
+* https://developer.chrome.com/blog/watch-video-using-picture-in-picture
+* https://developer.chrome.com/docs/web-platform/document-picture-in-picture
+* https://developer.mozilla.org/en-US/docs/Web/API/Document_Picture-in-Picture_API
+
+
+
 ## 2024-07-24 JS文件上传，中文文件名乱码
 
 
