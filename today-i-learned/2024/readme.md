@@ -44,23 +44,20 @@ async function enterPiPMode() {
 		});
     // 把目标元素挂载到画中画的body上
     pipWindow.document.body.append(con);
-    // 这里其实可以用画中画的body上挂载更多的html元素，比如添加一些自己的按钮之类的
+    // ***这里其实可以用画中画的body上挂载更多的html元素，比如添加一些自己的按钮之类的
   }
 ```
 
 
+写了个简单的demo，演示把一个 `div` 元素在画中画和源文档中进行切换：[https://output.jsbin.com/xayejew](https://output.jsbin.com/xayejew)
+
 
 **注意**，由于我们之前是把源DOM挂载到了画中画窗口，在退出画中画模式的时候，需要找到源DOM的父节点，重新把源DOM挂载回本来的位置上。
 
-**另外**，进过我的demo测试，画中画的 `pipWindow` 不能重复使用，每次进入都需要新生成一个，不知道是不是使用姿势不太对，而且官方文档也提到了上面把 `CSS` 样式从源文档复制到画中画也是一次性的。
+**另外**，经过我的demo测试，画中画的 `pipWindow` 不能重复使用，每次进入都需要新生成一个，不知道是不是使用姿势不太对，而且官方文档也提到了上面把 `CSS` 样式从源文档复制到画中画也是一次性的。
 
 
-
-写了个简单的demo，演示把一个 `div` 元素在画中画和源文档中进行切换：https://output.jsbin.com/xayejew
-
-
-
-Google文档上放了这个demo(https://lazy-guy.github.io/tomodoro/index.html)，还比较好看，[源码](https://github.com/lazy-guy/tomodoro/blob/main/index.js#L1579)也可以参考下，截图吐下：
+Google文档上放了这个demo([https://lazy-guy.github.io/tomodoro/index.html](https://lazy-guy.github.io/tomodoro/index.html))，还比较好看，[源码](https://github.com/lazy-guy/tomodoro/blob/main/index.js#L1579)也可以参考下，截图如下：
 
 ![画中画demo示例截图](./assets/pip-shot.png)
 
@@ -76,7 +73,7 @@ Google文档上放了这个demo(https://lazy-guy.github.io/tomodoro/index.html)�
 
 ### 使用限制
 
-画中画窗口类似于通过 Window.open() 打开的 **同源** 空白窗口，但有一些区别：
+画中画窗口类似于通过 `window.open()` 打开的 **同源** 空白窗口，但有一些区别：
 
 - 画中画窗口浮在其他窗口之上。
 - 画中画窗口不会超过打开窗口的生命周期，主页面关闭（或者reload），画中画窗口都会关闭。
@@ -88,9 +85,9 @@ Google文档上放了这个demo(https://lazy-guy.github.io/tomodoro/index.html)�
 
 ### 参考文档
 
-* https://developer.chrome.com/blog/watch-video-using-picture-in-picture
-* https://developer.chrome.com/docs/web-platform/document-picture-in-picture
-* https://developer.mozilla.org/en-US/docs/Web/API/Document_Picture-in-Picture_API
+* [https://developer.chrome.com/blog/watch-video-using-picture-in-picture](https://developer.chrome.com/blog/watch-video-using-picture-in-picture)
+* [https://developer.chrome.com/docs/web-platform/document-picture-in-picture](https://developer.chrome.com/docs/web-platform/document-picture-in-picture)
+* [https://developer.mozilla.org/en-US/docs/Web/API/Document_Picture-in-Picture_API](https://developer.mozilla.org/en-US/docs/Web/API/Document_Picture-in-Picture_API)
 
 
 
