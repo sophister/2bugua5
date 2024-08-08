@@ -2,6 +2,148 @@
 
 
 
+## 20240808 vue项目里proxy代理不生效
+
+最近接手了一坨前辈的祖传代码，技术栈倒也不是太原始，看到是`vue2`，那还不是 `npm i && npm start`一把梭么。然而，事实证明我还是太年轻了。
+
+首先，前辈并没有使用 `npm start` 来作为本地开发命令，改成了 `npm run dev` ，这也还好。接下来的事情就炸裂了：项目根目录下有 `vue.config.js` 文件，里面还配置了 `devServer.proxy` ，但是我本地开发始终没生效！再次仔细看了下 `package.json` 里的命令，原来前辈并没有用 `vue-cli` 来编译打包，而是自己用 `webpack-dev-server` 来启动的本地开发，嗯，有可能搞了什么尖端科技，所以没法用 `vue-cli` 这种开箱即用的东东吧。
+
+找遍了前辈写的一堆配置，并没有发现外星科技……这样的操作其实是有问题的，**不遵守业界惯例，会带来非常大的沟通和维护成本** 。就像有个测试大佬，在安装 `nginx` 的时候，总喜欢不用标准的默认路径 `/usr/local/nginx` ，而是自己非要在 `local` 下加一层别的目录名，加完之后大概是 `/usr/local/ourserver/nginx` 之类的。
+
+我个人实在不敢赞同这种，**放着业界惯例不用，自己单独发明一套的做法，除了增加潜在的成本，并没有任何卵用**。年轻的时候总喜欢自己封装系统，后来发现自己封装的也能work，但你就没法和业界交流了，闭门造车虽然也能造出来，但你造出来马车的时候，业界已经造出新能源了。
+
+话题扯远了，接着说项目里遇到的问题。
+
+最初我也以为是 `proxy` 配置没生效，但是我在正确的配置文件里加上之后，浏览器里还是报 **404** 错误，找不到接口。把浏览器请求 `copy as cURL` 然后把请求URL改成代理的域名，在命令行里又可以请求到数据，诡异了……
+
+作为高级 Google-Oriented-Developer ，肯定找谷哥要答案了。过程就不说了，主要的各种issue都没能解决问题，最后在这篇文章里（[https://marcus.handte.org/2020/02/29/using-webpacks-development-server-to-proxy-api-requests/](https://marcus.handte.org/2020/02/29/using-webpacks-development-server-to-proxy-api-requests/)）找到了答案，需要在 `proxy` 配置下，增加 `headers.Host` 这个字段，设置为我要代理的目标域名（PS，是走的域名请求，并且是 `https` 的）。类似下面这样：
+
+```javascript
+{
+  "/api": {
+     "target": "https://myserver.com",
+     "headers": {
+       // 这里域名和上面 target 里的域名保持一致
+       "Host":"myserver.com"
+     }
+   }
+}
+```
+
+原文里也解释了，这个是 [webpack-dev-server](https://webpack.js.org/configuration/dev-server/) 的问题（`vue-cli`里的proxy就是用的这个），在转发目标服务器时，没有正确处理请求的 `Host` 头，导致在 **部分https目标域名下** 代理出问题，可能是服务器返回了错误的 `https` 证书，或者目标服务器继续转发到了错误的后端服务。
+
+我这次的问题，就是目标域名是一个 `https` 的，并且目标服务器上（同样是 `nginx`代理）有多个域名的转发规则并且**默认域名并不是我用到的域名** ，就导致我的请求其实是正确代理到了目标服务器上，只是被 `nginx`转发到了错误的后端服务了。
+
+由于我们目标域名的 `https` 证书是一个 **泛域名证书**（子域名是*号），所以我并没有遇到 `https` 证书错误问题。但是由于我们请求里，没有正确的 `Host`，目标 `nginx` 只有根据默认的服务来转发，就转到了不是我们预期的后端服务上。
+
+
+
+### nginx匹配请求和server块
+
+根据nginx官方文档：[https://nginx.org/en/docs/http/request_processing.html#mixed_name_ip_based_servers](https://nginx.org/en/docs/http/request_processing.html#mixed_name_ip_based_servers) ，nginx在决定请求应该明中哪个 `server` 块时，是根据请求中的 `Host` 字段，来和 `server_name` 匹配的。上面我们遇到的代理异常问题，正是由于缺少了请求的 `Host` 头，`nginx` 把请求转发到了默认的 `server` 块上了。
+
+nginx这篇文档（[https://nginx.org/en/docs/http/server_names.html#virtual_server_selection](https://nginx.org/en/docs/http/server_names.html#virtual_server_selection)），也说明了再决定 `server_name` 值的时候，有考虑到 `SNI`（在`https`握手阶段）、请求的 `Host` 头。
+
+根据上面的文档，我的理解是，`nginx` 是在处理 `https`请求时，下发给客户端的`https`证书可能匹配了域名A，但是后续实际转发请求时，是根据请求头中的 `Host` 来重新匹配的域名B。即在一次 `https`请求处理中，可能在 `https`握手阶段和实际处理http请求阶段，命中的不同的 `server` 块（`https`握手阶段根据请求中的 `SNI`来匹配 `server_name`；实际请求时根据 `Host` 头来匹配 `server_name`）。
+
+感觉有点怪，正好找了部署在同一个`nginx`（也就是同一个IP）的2个域名，这两个域名返回的内容是不同的，我测试下设置了不同于URL请求的域名，`nginx`会怎么处理：
+
+```shell
+# 正常情况下的请求
+curl --insecure -vvI "https://eapi2.ecool.fun"
+*   Trying 110.42.173.186:443...
+* Connected to eapi2.ecool.fun (110.42.173.186) port 443
+* ALPN: curl offers h2,http/1.1
+* (304) (OUT), TLS handshake, Client hello (1):
+* (304) (IN), TLS handshake, Server hello (2):
+## 省略很多 
+* ALPN: server accepted http/1.1
+* Server certificate:
+## 证书里的域名，和请求的URL里域名一致的
+*  subject: CN=eapi2.ecool.fun
+*  start date: Oct  2 00:00:00 2023 GMT
+*  expire date: Oct  1 23:59:59 2024 GMT
+*  issuer: C=US; O=DigiCert Inc; OU=www.digicert.com; CN=Encryption Everywhere DV TLS CA - G2
+*  SSL certificate verify ok.
+* using HTTP/1.1
+> HEAD / HTTP/1.1
+> Host: eapi2.ecool.fun
+> User-Agent: curl/8.4.0
+> Accept: */*
+>
+
+HTTP/1.1 200 OK
+Date: Thu, 08 Aug 2024 06:38:31 GMT
+Content-Type: application/json; charset=utf-8
+## 注意看这里，后端返回的body大小
+Content-Length: 63
+```
+
+下面是我修改了请求的 `Host` 头，执行情况：
+
+```shell
+# 修改了请求的 `Host`，和原始的URL不一样
+curl --insecure -vvI "https://eapi2.ecool.fun" -H 'Host: fe.ecool.fun'
+*   Trying 110.42.173.186:443...
+* Connected to eapi2.ecool.fun (110.42.173.186) port 443
+* ALPN: curl offers h2,http/1.1
+* (304) (OUT), TLS handshake, Client hello (1):
+* (304) (IN), TLS handshake, Server hello (2):
+# 省略掉连接过程
+* ALPN: server accepted http/1.1
+* Server certificate:
+# 注意看这里，返回的https证书，还是请求URL域名对应的证书，并不是 Host 对应的
+*  subject: CN=eapi2.ecool.fun
+*  start date: Oct  2 00:00:00 2023 GMT
+*  expire date: Oct  1 23:59:59 2024 GMT
+*  issuer: C=US; O=DigiCert Inc; OU=www.digicert.com; CN=Encryption Everywhere DV TLS CA - G2
+*  SSL certificate verify ok.
+* using HTTP/1.1
+> HEAD / HTTP/1.1
+> Host: fe.ecool.fun
+> User-Agent: curl/8.4.0
+> Accept: */*
+>
+
+HTTP/1.1 200 OK
+Date: Thu, 08 Aug 2024 06:41:34 GMT
+Content-Type: text/html; charset=utf-8
+########################## 注意这里，返回的body大小，明显和第一个实验返回的差异很大
+Content-Length: 156354
+```
+
+从上面实验结果可以看出来，**修改请求的 Host 头，会影响nginx实际转发时匹配的 server 块，有可能和https握手阶段选择的 server 块是不同的** 。
+
+
+
+### Server Name Indication 介绍
+
+这里有一个关于 `https` 认证里的知识点，`Server Name Indication` 简称 `SNI`（关于SNI，可以参考这篇文章[https://www.cloudflare.com/learning/ssl/what-is-sni/](https://www.cloudflare.com/learning/ssl/what-is-sni/)），简单说就是，我们为了节省服务器资源，有可能同一台服务器上，通过 `nginx` 之类的代理配置了N个不同的网站（也就是不同域名），同时每个域名都有自己的 `https` 证书，大家都知道，浏览器在建立TCP连接之后，我们需要建立 TLS 连接，客户端会向服务器返送 `Client Hello`，在这里面，可能会带上 `SNI`的信息，可以参考这篇文章里的截图[https://mohak1712.medium.com/server-name-indication-3575caeaf3df](https://mohak1712.medium.com/server-name-indication-3575caeaf3df) 。这时候，服务器才知道，应该把哪个域名对应的 `https`证书返回给客户端。
+
+
+
+### 结论
+
+最后，再总结下，在 `vue` 本地开发代理（我理解 `react`也同理），通过 `webpack-dev-server` 配置接口代理的时候，最好带上 `headers.Host`，同时再设置上 `changOrigin` 和 `secure` ，类似下面这样：
+
+```javascript
+{
+  "/api": {
+     target: "https://myserver.com",
+     changOrigin: true,
+     secure: false,
+     headers: {
+       // 这里域名和上面 target 里的域名保持一致
+       "Host":"myserver.com"
+     }
+   }
+}
+```
+
+
+
+
+
 ## 20240731浏览器画中画API(document-picture-in-picture)
 
 今天在看一个微信文档的时候，看到视频下方的按钮中，有一个奇怪的icon，hover上去显示的是 *PiP mode* ，感觉很深不可测的样子。点击之后，视频出现在单独的一个小窗口中，并且悬浮在其他窗口上方，这就是传说中的 **画中画** 么。
