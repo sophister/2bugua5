@@ -24,6 +24,7 @@ OK，Here we go 😏
 
 ## TOC
 
+* [2025年](./2025/readme.md)
 * [2024年](./2024/readme.md)
 * [2023年](./2023/readme.md)
 * [2020年](./2020/readme.md)
