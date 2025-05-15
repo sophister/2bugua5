@@ -7,4 +7,5 @@
 * [MCP server开发半入门](./mcp-hello-world.md)
 * [MCP 协议关于tool 的几个基础问题](./mcp-basic-intro.md)
 * [【译】Zip炸弹：对抗恶意爬虫访问](./zip-bombs-for-spot.md)
+* [WebAssembly，前后端通信加密](./wasm-for-encrypt.md)
 * 
